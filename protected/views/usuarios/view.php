@@ -11,31 +11,31 @@
 </div>
 <div class="modal-body">
 	<div class="view">
-		<b><?php echo CHtml::encode($data->getAttributeLabel('email')); ?>:</b>
-		<?php echo CHtml::encode($data->email); ?>
+		<b><?php echo CHtml::encode($model->getAttributeLabel('email')); ?>:</b>
+		<?php echo CHtml::encode($model->email); ?>
 		<br />
 		
-		<b><?php echo CHtml::encode($data->getAttributeLabel('nombre')); ?>:</b>
-		<?php echo CHtml::encode($data->nombre); ?>
+		<b><?php echo CHtml::encode($model->getAttributeLabel('nombre')); ?>:</b>
+		<?php echo CHtml::encode($model->nombre); ?>
 		<br />
 		
-		<b><?php echo CHtml::encode($data->getAttributeLabel('tipo')); ?>:</b>
-		<?php echo CHtml::encode($data->tipo); ?>
+		<b><?php echo CHtml::encode($model->getAttributeLabel('tipo')); ?>:</b>
+		<?php echo CHtml::encode($model->tipo); ?>
 		<br />
 		
-		<b><?php echo CHtml::encode($data->getAttributeLabel('status')); ?>:</b>
-		<?php echo CHtml::encode($data->status == 1 ? 'Activo' : 'Inactivo'); ?>
+		<b><?php echo CHtml::encode($model->getAttributeLabel('status')); ?>:</b>
+		<?php echo CHtml::encode($model->status == 1 ? 'Activo' : 'Inactivo'); ?>
 		<br />
 		
 		<b><?php echo CHtml::encode('Número de encuestas asignadas'); ?>:</b>
-		<?php echo CHtml::encode($data->count_encuestas_asignadas); ?>
+		<?php echo CHtml::encode($model->count_encuestas_asignadas); ?>
 		<br />
 		
 		<?php
-			if($data->tipo == 'Administrador') {
+			if($model->tipo == 'Administrador') {
 		?>
 			<b><?php echo CHtml::encode('Número de encuestas creadas'); ?>:</b>
-			<?php echo CHtml::encode($data->fk_administradores_et->count_encuestas_creadas); ?>
+			<?php echo CHtml::encode($model->fk_administradores_et->count_encuestas_creadas); ?>
 			<br />	
 		<?php
 			}

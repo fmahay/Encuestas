@@ -4,13 +4,22 @@
  * fecha: 25-marzo-2013
  */
 
-class UsuariosController extends Controller
+class UsuariosController extends SCController
 {
+	public $layout='//layouts/column2';
+	
 	/**
 	 * Lists all models.
 	 */
-	public function actionIndex()
-	{
+	public function actionIndex() {
+		$model_usuario = new Usuarios;
+		$model_usuario->scenario = 'create';
+		
+		// Uncomment the following line if AJAX validation is needed
+		$this->performAjaxValidation($model_usuario);
+		
+		$this->actionCreate($model_usuario);	
+		
 		$model=new Usuarios('search');
 		$model->unsetAttributes();  // clear any default values
 		if(isset($_GET['Usuarios']))
@@ -18,6 +27,7 @@ class UsuariosController extends Controller
 
 		$this->render('index',array(
 			'model'=>$model,
+			'model_usuario'=>$model_usuario,
 		));
 	}
 	
@@ -25,8 +35,7 @@ class UsuariosController extends Controller
 	 * Creates a new model.
 	 * If creation is successful, the browser will be redirected to the 'index' page.
 	 */
-		public function actionCreate() {
-		$model = new Usuarios;
+	private function actionCreate($model) {
 		// Uncomment the following line if AJAX validation is needed
 		$this->performAjaxValidation($model);
 		if(isset($_POST['Usuarios']))
@@ -37,14 +46,69 @@ class UsuariosController extends Controller
 			$model->check_tipo == 1 ? $model->tipo = 'Administrador' : $model->tipo = 'Normal';
 			$model->pass_php = md5($model->pass);
 			$model->session = $model->generateSalt();
-			$model->pass_hash= $model->hashPassword($_POST['Usuarios']['pass'], $model->session);
+			$model->pass_hash= $model->hashPassword($model->pass, $model->session);
 			
-			if($model->save()) {
-				$this->transaction->commit();
-				$this->actionIndex();
+			if($model->save())
+				$this->redirect('index');
+		}
+	}
+	
+	/**
+	 * Updates a particular model.
+	 * If update is successful, the browser will be redirected to the 'profile' page.
+	 */
+	public function actionUpdate() {
+		if(Yii::app()->user->getId() != null && Yii::app()->user->getState("tipo") != null) {
+			$email = Yii::app()->user->getId();
+			$tipo = Yii::app()->user->getState("tipo");
+			
+			$model = $this->loadModel($email, $tipo);
+			
+			// Uncomment the following line if AJAX validation is needed
+			$this->performAjaxValidation($model);
+			if(isset($_POST['Usuarios'])) {
+				$model->attributes=$_POST['Usuarios'];
+				if($model->save())
+					$this->redirect(array('profile'));
+			}
+			
+			$this->render('_form', array(
+				'model'=>$model,
+			));
+			
+		} else
+			throw new CHttpException(404, 'The requested page does not exist.');
+	}
+
+	/**
+	 * Change status from a particular model.
+	 * If deletion is successful, the browser will be redirected to the 'index' page.
+	 */
+	public function actionDelete() {
+		if(isset($_POST['val_email']) && isset($_POST['val_tipo'])) {
+			$email = $_POST['val_email'];
+			$tipo = $_POST['val_tipo'];
+				
+			$model=$this->loadModel($email, $tipo);
+			
+			#if(isset($_POST['Usuarios'])) {
+				#$model->attributes=$_POST['Usuarios'];
+			$status = $model->status == 1 ? 0:1;
+			
+			$sql = "UPDATE Usuarios SET status=:status WHERE email=:email and tipo=:tipo";  
+		    $comando = Yii::app()->db->createCommand($sql);  
+		    $comando->bindParam(":status", $status, PDO::PARAM_STR);  
+		    $comando->bindParam(":email", $email, PDO::PARAM_STR);  
+		    $comando->bindParam(":tipo", $tipo, PDO::PARAM_STR);  
+		    $control = $comando->execute();
+			
+			if($control > 0) {
+				$this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('index'));
 			}
 		}
-		$this->renderPartial('create', array('model'=>$model));
+		
+		$this->redirect('index');
+			
 	}
 	
 	/**
@@ -54,81 +118,62 @@ class UsuariosController extends Controller
 	 */
 	public function actionView($email, $tipo) {
 		$this->renderPartial('view', array(
-			'data'=>$this->loadModel($email, $tipo),
+			'model'=>$this->loadModel($email, $tipo),
 		));
 	}
 	
 	/**
-	 * Change status from a particular model.
-	 * If deletion is successful, the browser will be redirected to the 'index' page.
-	 * @param String $email fisrt element of composite primary key
-	 * @param String $tipo second element of composite primary key
+	 * Displays a particular model (user perfil).
 	 */
-	public function actionDelete($email, $tipo)
-	{				
-		$model=$this->loadModel($email, $tipo);
+	public function actionProfile() {
+		if(Yii::app()->user->getId() != null && Yii::app()->user->getState("tipo") != null) {
+			$email = Yii::app()->user->getId();
+			$tipo = Yii::app()->user->getState("tipo");
+			
+			$this->render('profile', array(
+				'model'=>$this->loadModel($email, $tipo),
+			));	
+		} else
+			throw new CHttpException(404,'The requested page does not exist.');
 		
-		if(isset($_POST['Usuarios'])) {
-			#$model->attributes=$_POST['Usuarios'];
-			$status = 0;
-			$this->transaction = $model->dbConnection->beginTransaction();
-			try {
-				$sql = "UPDATE Usuarios SET status=:status WHERE email=:email and tipo=:tipo";  
-			    $comando = Yii::app()->db->createCommand($sql);  
-			    $comando->bindParam(":status", $status, PDO::PARAM_STR);  
-			    $comando->bindParam(":email", $email, PDO::PARAM_STR);  
-			    $comando->bindParam(":tipo", $tipo, PDO::PARAM_STR);  
-			    $control = $comando->execute();
-				
-				if($control > 0) {
-					$this->transaction->commit();
-					#$this->actionIndex();
-					$this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('index'));
-				}
-			} catch(Exception $e) {
-				$this->transaction->rollBack();
-			}
-		}
-
-		$this->renderPartial('delete',array(
-			'model'=>$model,
-		));
 	}
 	
-	// Uncomment the following methods and override them if needed
-	/*
-	public function filters()
-	{
-		// return the filter configuration for this controller, e.g.:
-		return array(
-			'inlineFilterName',
-			array(
-				'class'=>'path.to.FilterClass',
-				'propertyName'=>'propertyValue',
-			),
-		);
+	/**
+	 * Change password from a particular model
+	 */
+	public function actionChangePassword() {
+		if(Yii::app()->user->getId() != null && Yii::app()->user->getState("tipo") != null) {
+			$email = Yii::app()->user->getId();
+			$tipo = Yii::app()->user->getState("tipo");
+			
+			$model = $this->loadModel($email, $tipo);
+			$model->scenario = 'changePassword';
+			
+			// Uncomment the following line if AJAX validation is needed
+			$this->performAjaxValidation($model);
+			if(isset($_POST['Usuarios'])) {
+				$model->attributes=$_POST['Usuarios'];
+				
+				$model->pass_php = md5($model->confirm_new_pass);
+				$model->pass_hash = $model->hashPassword($model->confirm_new_pass, $model->session);
+				if($model->save())
+					$this->redirect(array('profile'));
+			}
+			
+			$this->render('change_password', array(
+				'model'=>$model,
+			));
+			
+		} else
+			throw new CHttpException(404, 'The requested page does not exist.');
 	}
-
-	public function actions()
-	{
-		// return external action classes, e.g.:
-		return array(
-			'action1'=>'path.to.ActionClass',
-			'action2'=>array(
-				'class'=>'path.to.AnotherActionClass',
-				'propertyName'=>'propertyValue',
-			),
-		);
-	}
-	*/
 	
 	/**
 	 * Returns the data model based on the primary key given in the GET variable.
 	 * If the data model is not found, an HTTP exception will be raised.
 	 * @param integer the ID of the model to be loaded
 	 */
-	public function loadModel($email, $tipo)
-	{
+	private function loadModel($email, $tipo) {
 		$model=Usuarios::model()->findByPk(array('email'=>$email, 'tipo'=>$tipo));
 		if($model===null)
 			throw new CHttpException(404,'The requested page does not exist.');
@@ -139,8 +184,7 @@ class UsuariosController extends Controller
 	 * Performs the AJAX validation.
 	 * @param CModel the model to be validated
 	 */
-	protected function performAjaxValidation($model)
-	{
+	protected function performAjaxValidation($model) {
 		if(isset($_POST['ajax']) && $_POST['ajax']==='usuarios-form')
 		{
 			echo CActiveForm::validate($model);

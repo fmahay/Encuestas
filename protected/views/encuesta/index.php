@@ -1,8 +1,8 @@
 <?php
-/* @var $this EncuestasController */
+/* @var $this EncuestaController */
 
 $this->breadcrumbs=array(
-	'Encuestas',
+	'Encuesta',
 );
 ?>
 <h1><?php echo $this->id . '/' . $this->action->id; ?></h1>

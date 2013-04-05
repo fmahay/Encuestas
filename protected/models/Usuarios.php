@@ -9,6 +9,8 @@
  * @property string $nombre
  * @property string $check_tipo
  * @property string $pass
+ * @property string $new_pass
+ * @property string $confirm_new_pass
  * @property string $pass_php
  * @property string $pass_hash
  * @property integer $status
@@ -25,6 +27,8 @@
 class Usuarios extends CActiveRecord
 {
 	public $pass;
+	public $new_pass;
+	public $confirm_new_pass;
 	public $check_tipo;
 	
 	/**
@@ -87,20 +91,23 @@ class Usuarios extends CActiveRecord
 	 */
 	public function rules()
 	{
-		// NOTE: you should only define rules for those attributes that
-		// will receive user inputs.
+		// NOTE: you should only define rules for those attributes that will receive user inputs.
 		return array(
-			array('email, nombre, pass', 'required'),
-			array('check_tipo', 'boolean'),
-			array('status', 'numerical', 'integerOnly'=>true),
+			array('email, nombre', 'required'),
+			array('pass', 'required', 'on'=>'create, changePassword'),
+			array('new_pass, confirm_new_pass', 'required', 'on'=>'changePassword'),
+			array('confirm_new_pass', 'compare', 'compareAttribute'=>'new_pass', 'on'=>'changePassword', 'message'=>'La nueva contraseña y la confirmación deben de ser exactamente iguales.'),
+			array('pass', 'validatorPass', 'on'=>'changePassword'),
+			array('check_tipo', 'boolean', 'on'=>'create'),
+			array('status', 'numerical', 'integerOnly'=>true, 'on'=>'create'),
 			array('email', 'length', 'max'=>150),
 			array('email', 'email'),
 			array('email', 'unique','attributeName'=>'email','className'=>'usuarios','allowEmpty'=>false, 'message'=>'{value} ya existe, ingrese otro email.'),
-			array('tipo', 'length', 'max'=>45),
+			array('tipo', 'length', 'max'=>45, 'on'=>'create'),
 			array('nombre', 'length', 'max'=>200),
-			array('pass', 'length', 'min'=>8),
+			array('pass', 'length', 'min'=>8, 'on'=>'create, changePassword'),
+			array('new_pass, confirm_new_pass', 'length', 'min'=>8, 'on'=>'changePassword'),
 			// The following rule is used by search().
-			// Please remove those attributes that should not be searched.
 			array('email, tipo, nombre, status', 'safe', 'on'=>'search'),
 		);
 	}
@@ -113,10 +120,7 @@ class Usuarios extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			#Verificar las claves primarias compuestas en una misma relacion
 			'fk_administradores_et' => array(self::HAS_ONE, 'Administradores', 'email, tipo'),
-			#'fk_administradores_email' => array(self::HAS_MANY, 'Administradores', 'email, tipo'),
-			#'fk_administradores_tipo' => array(self::HAS_MANY, 'Administradores', 'tipo'),
 			'fk_detEncuestas_email' => array(self::HAS_MANY, 'DetEncuestas', 'fk_usuarios_email'),
 			'fk_detEncuestases_tipo' => array(self::HAS_MANY, 'DetEncuestas', 'fk_usuarios_tipo'),
 			'fk_respuestas_email' => array(self::HAS_MANY, 'Respuestas', 'fk_usuarios_email'),
@@ -125,6 +129,13 @@ class Usuarios extends CActiveRecord
 		);
 	}
 
+	/**
+	 * Check if the password especific is equals to actual password
+	 */
+	public function validatorPass($attribute, $params) {
+		if($this->hashPassword($this->$attribute, $this->session) !== Yii::app()->user->getState('pass_hash') && md5($this->$attribute) !== Yii::app()->user->getState('pass_hash'))
+			 $this->addError($attribute, 'La contraseña ingresada no coincide con la actual.');
+	}
 	/**
 	 * @return array customized attribute labels (name=>label)
 	 */
@@ -135,7 +146,9 @@ class Usuarios extends CActiveRecord
 			'tipo' => 'Tipo',
 			'check_tipo' => 'Privilegios de Administrador',
 			'nombre' => 'Nombre',
-			'pass' => 'Password',
+			'pass' => 'Contraseña',
+			'new_pass' => 'Nueva Contraseña',
+			'confirm_new_pass' => 'Confirmar Nueva Contraseña',
 			'pass_php' => 'Pass Php',
 			'pass_hash' => 'Pass Hash',
 			'status' => 'Status',
@@ -160,6 +173,7 @@ class Usuarios extends CActiveRecord
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
+			'pagination'=>array('pageSize'=>5),
 		));
 	}
 }
