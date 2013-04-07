@@ -83,7 +83,7 @@ class Usuarios extends CActiveRecord
 	}
 	
 	public static function getStatus() {
-		return $list_status= array('0'=>'Inactivo', '1'=>'Activo');
+		return $list_status = array('0'=>'Inactivo', '1'=>'Activo');
 	}
 
 	/**

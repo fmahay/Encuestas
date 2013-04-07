@@ -13,10 +13,10 @@
  * @property string $fk_admin_tipo
  *
  * The followings are the available model relations:
- * @property DetEncuestas[] $fk_det_encuestas
- * @property Administradores $fk_admin_tpo
- * @property Administradores $fk_admin_email
- * @property Preguntas[] $fk_preguntas
+ * @property DetEncuestas[] $detEncuestases
+ * @property Administradores $fkAdminTipo
+ * @property Administradores $fkAdminEmail
+ * @property Preguntas[] $preguntases
  */
 class Encuesta extends CActiveRecord
 {
@@ -38,20 +38,23 @@ class Encuesta extends CActiveRecord
 		return 'encuesta';
 	}
 
+	public static function getStatus() {
+		return $list_status= array('0'=>'Inactivo', '1'=>'Activo');
+	}
+
 	/**
 	 * @return array validation rules for model attributes.
 	 */
 	public function rules()
 	{
-		// NOTE: you should only define rules for those attributes that
-		// will receive user inputs.
+		// NOTE: you should only define rules for those attributes that will receive user inputs.
 		return array(
 			array('nombre, fecha_inicio, fecha_fin, fk_admin_email, fk_admin_tipo', 'required'),
-			array('status', 'numerical', 'integerOnly'=>true),
 			array('nombre, fk_admin_email', 'length', 'max'=>150),
-			array('fk_admin_tipo', 'length', 'max'=>45),
+           	array('fecha_inicio, fecha_fin', 'date', 'format'=>array('yyyy-MM-dd'), 'allowEmpty'=>false),
+           	array('fecha_fin', 'compareDate','compareAttribute'=>'fecha_inicio', 'operator'=>'<', 'format'=>'yyyy-MM-dd', 'message'=> 'La fecha final debe de ser mayor a la fecha de inicio.'),
+			#SE DEBE DE CREAR UNA REGLA PARA VERIFICAR QUE LA FECHA_FIN SEA MAYOR A LA DE INICIO Y VICEVERSA
 			// The following rule is used by search().
-			// Please remove those attributes that should not be searched.
 			array('id, nombre, fecha_inicio, fecha_fin, status, fk_admin_email, fk_admin_tipo', 'safe', 'on'=>'search'),
 		);
 	}
@@ -64,11 +67,29 @@ class Encuesta extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'fk_det_encuestas' => array(self::BELONGS_TO, 'DetEncuestas', 'fk_encuesta'),
-			'fk_admin_tipo' => array(self::BELONGS_TO, 'Administradores', 'fk_admin_tipo'),
-			'fk_admin_email' => array(self::BELONGS_TO, 'Administradores', 'fk_admin_email'),
+			'fk_det_encuesta' => array(self::HAS_MANY, 'DetEncuestas', 'fk_encuesta'),
+			'fk_admin' => array(self::BELONGS_TO, 'Administradores', 'fk_admin_email, fk_admin_tipo'),
 			'fk_preguntas' => array(self::HAS_MANY, 'Preguntas', 'id_encuesta'),
 		);
+	}
+
+	/**
+	* Comparation between two dates
+	*/
+	public function compareDate($attribute, $params) {
+		if (empty($params['compareAttribute']) || empty($params['operator']))
+           $this->addError($attribute, 'Parametros inválidos');
+
+       $compare_date = $this->$params['compareAttribute'];
+       $format = (!empty($params['format'])) ? $params['format'] : 'yyyy-MM-dd';
+       $operator = (!empty($params['operator'])) ? $params['operator'] : '<';
+       $message = (!empty($params['message'])) ? $params['message'] : "$attributes no es $operator que la ".$params['compareAttribute'];
+
+       $start = CDateTimeParser::parse($this->$attribute,$format);
+       $end = CDateTimeParser::parse($compare_date,$format);
+
+       if (version_compare($start, $end, $operator))
+       		$this->addError($attribute, $message);
 	}
 
 	/**
@@ -77,7 +98,7 @@ class Encuesta extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'id' => 'ID',
+			'id' => 'ID Encuesta',
 			'nombre' => 'Nombre',
 			'fecha_inicio' => 'Fecha Inicio',
 			'fecha_fin' => 'Fecha Fin',
@@ -96,15 +117,17 @@ class Encuesta extends CActiveRecord
 		// Warning: Please modify the following code to remove attributes that
 		// should not be searched.
 
+		$email = Yii::app()->user->getId();
+		$tipo = Yii::app()->user->getState('tipo');
+
 		$criteria=new CDbCriteria;
+		$criteria->condition = "fk_admin_email = '$email' && fk_admin_tipo = '$tipo'";
 
 		$criteria->compare('id',$this->id);
 		$criteria->compare('nombre',$this->nombre,true);
 		$criteria->compare('fecha_inicio',$this->fecha_inicio,true);
 		$criteria->compare('fecha_fin',$this->fecha_fin,true);
 		$criteria->compare('status',$this->status);
-		$criteria->compare('fk_admin_email',$this->fk_admin_email,true);
-		$criteria->compare('fk_admin_tipo',$this->fk_admin_tipo,true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

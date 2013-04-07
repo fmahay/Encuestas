@@ -13,7 +13,7 @@
 			return false;
 		});
 		$('.search-form form').submit(function(){
-			$.fn.yiiGridView.update('tareas-grid', {
+			$.fn.yiiGridView.update('usuarios-grid', {
 				data: $(this).serialize()
 			});
 			return false;
@@ -153,10 +153,8 @@
 	'pager'=>array(
 		'cssFile'=>false,
 		'header'=>'',
-		#'firstPageLabel' => 'First',
 		'prevPageLabel'  => '«',
 	    'nextPageLabel'  => '»',
-	    #'lastPageLabel' => 'Last',
 	    'selectedPageCssClass' => 'active'
 	)
 ));

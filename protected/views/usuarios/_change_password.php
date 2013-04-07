@@ -1,6 +1,9 @@
 <?php
 /*@var this UsuariosController*/
 /*@var model Usuarios*/
+$this->breadcrumbs=array(
+	'Cambiar Contraseña',
+);
 ?>
 
 <div class="form">

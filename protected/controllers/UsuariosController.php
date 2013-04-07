@@ -15,7 +15,6 @@ class UsuariosController extends SCController
 		$model_usuario = new Usuarios;
 		$model_usuario->scenario = 'create';
 		
-		// Uncomment the following line if AJAX validation is needed
 		$this->performAjaxValidation($model_usuario);
 		
 		$this->actionCreate($model_usuario);	
@@ -36,7 +35,6 @@ class UsuariosController extends SCController
 	 * If creation is successful, the browser will be redirected to the 'index' page.
 	 */
 	private function actionCreate($model) {
-		// Uncomment the following line if AJAX validation is needed
 		$this->performAjaxValidation($model);
 		if(isset($_POST['Usuarios']))
 		{
@@ -64,7 +62,6 @@ class UsuariosController extends SCController
 			
 			$model = $this->loadModel($email, $tipo);
 			
-			// Uncomment the following line if AJAX validation is needed
 			$this->performAjaxValidation($model);
 			if(isset($_POST['Usuarios'])) {
 				$model->attributes=$_POST['Usuarios'];
@@ -91,8 +88,6 @@ class UsuariosController extends SCController
 				
 			$model=$this->loadModel($email, $tipo);
 			
-			#if(isset($_POST['Usuarios'])) {
-				#$model->attributes=$_POST['Usuarios'];
 			$status = $model->status == 1 ? 0:1;
 			
 			$sql = "UPDATE Usuarios SET status=:status WHERE email=:email and tipo=:tipo";  
@@ -117,7 +112,7 @@ class UsuariosController extends SCController
 	 * @param Strint $tipo second element of composite primary key
 	 */
 	public function actionView($email, $tipo) {
-		$this->renderPartial('view', array(
+		$this->renderPartial('_view', array(
 			'model'=>$this->loadModel($email, $tipo),
 		));
 	}
@@ -149,7 +144,6 @@ class UsuariosController extends SCController
 			$model = $this->loadModel($email, $tipo);
 			$model->scenario = 'changePassword';
 			
-			// Uncomment the following line if AJAX validation is needed
 			$this->performAjaxValidation($model);
 			if(isset($_POST['Usuarios'])) {
 				$model->attributes=$_POST['Usuarios'];
@@ -160,7 +154,7 @@ class UsuariosController extends SCController
 					$this->redirect(array('profile'));
 			}
 			
-			$this->render('change_password', array(
+			$this->render('_change_password', array(
 				'model'=>$model,
 			));
 			

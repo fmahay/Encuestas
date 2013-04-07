@@ -2,6 +2,9 @@
 /* @var $this UsuariosController*/
 /* @var $model Usuarios */
 /* @var $form CActiveForm */
+$this->breadcrumbs=array(
+	'Editar Perfil',
+);
 ?>
 <div class="form">
 	<center>

@@ -1,6 +1,9 @@
 <?php
 /*@var this UsuariosController*/ 
-/*@var model Usuarios*/ 
+/*@var model Usuarios*/
+$this->breadcrumbs=array(
+	'Mi Perfil',
+); 
 ?>
 <div class="view">
 	<center>
