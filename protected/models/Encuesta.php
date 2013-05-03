@@ -20,6 +20,9 @@
  */
 class Encuesta extends CActiveRecord
 {
+	public $id_det;
+	public $status_det;
+
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @param string $className active record class name.
@@ -53,9 +56,9 @@ class Encuesta extends CActiveRecord
 			array('nombre, fk_admin_email', 'length', 'max'=>150),
            	array('fecha_inicio, fecha_fin', 'date', 'format'=>array('yyyy-MM-dd'), 'allowEmpty'=>false),
            	array('fecha_fin', 'compareDate','compareAttribute'=>'fecha_inicio', 'operator'=>'<', 'format'=>'yyyy-MM-dd', 'message'=> 'La fecha final debe de ser mayor a la fecha de inicio.'),
-			#SE DEBE DE CREAR UNA REGLA PARA VERIFICAR QUE LA FECHA_FIN SEA MAYOR A LA DE INICIO Y VICEVERSA
 			// The following rule is used by search().
 			array('id, nombre, fecha_inicio, fecha_fin, status, fk_admin_email, fk_admin_tipo', 'safe', 'on'=>'search'),
+			array('id, nombre, fecha_inicio, fecha_fin, status_det', 'safe', 'on'=>'searchMisEncuestas'),
 		);
 	}
 
@@ -70,6 +73,9 @@ class Encuesta extends CActiveRecord
 			'fk_det_encuesta' => array(self::HAS_MANY, 'DetEncuestas', 'fk_encuesta'),
 			'fk_admin' => array(self::BELONGS_TO, 'Administradores', 'fk_admin_email, fk_admin_tipo'),
 			'fk_preguntas' => array(self::HAS_MANY, 'Preguntas', 'id_encuesta'),
+			'count_preguntas' => array(self::STAT, 'Preguntas', 'id_encuesta', 'select'=>'COUNT(t.id)'),
+			'count_asignados' => array(self::STAT, 'DetEncuestas', 'fk_encuesta', 'select'=>'COUNT(t.id)'),
+			'count_respondidas' => array(self::STAT, 'DetEncuestas', 'fk_encuesta', 'select'=>'COUNT(t.id)','condition'=>'status=1'),
 		);
 	}
 
@@ -103,6 +109,7 @@ class Encuesta extends CActiveRecord
 			'fecha_inicio' => 'Fecha Inicio',
 			'fecha_fin' => 'Fecha Fin',
 			'status' => 'Status',
+			'status_det' => 'Status',
 			'fk_admin_email' => 'Fk Admin Email',
 			'fk_admin_tipo' => 'Fk Admin Tipo',
 		);
@@ -114,8 +121,6 @@ class Encuesta extends CActiveRecord
 	 */
 	public function search()
 	{
-		// Warning: Please modify the following code to remove attributes that
-		// should not be searched.
 
 		$email = Yii::app()->user->getId();
 		$tipo = Yii::app()->user->getState('tipo');
@@ -128,6 +133,26 @@ class Encuesta extends CActiveRecord
 		$criteria->compare('fecha_inicio',$this->fecha_inicio,true);
 		$criteria->compare('fecha_fin',$this->fecha_fin,true);
 		$criteria->compare('status',$this->status);
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+		));
+	}
+
+	public function searchMisEncuestas() {
+		$email = Yii::app()->user->getId();
+		$tipo = Yii::app()->user->getState('tipo');
+
+		$criteria=new CDbCriteria;
+		$criteria->select = "t.id, t.nombre, t.fecha_inicio, t.fecha_fin, t.status, de.id as id_det, de.status as status_det ";
+		$criteria->join = "INNER JOIN det_encuestas as de ON t.id = de.fk_encuesta ";
+		$criteria->condition = "de.fk_usuarios_email = '$email' && de. fk_usuarios_tipo = '$tipo' && t.status =1";
+
+		$criteria->compare('id',$this->id);
+		$criteria->compare('nombre',$this->nombre,true);
+		$criteria->compare('fecha_inicio',$this->fecha_inicio,true);
+		$criteria->compare('fecha_fin',$this->fecha_fin,true);
+		$criteria->compare('de.status',$this->status_det, true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

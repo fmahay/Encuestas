@@ -2,6 +2,7 @@
 /* @var $this EncuestaController */
 /* @var $model Encuesta */
 /* @var $form CActiveForm */
+
 ?>
 
 <div class="form">
@@ -70,7 +71,7 @@
 	</div>
 
 	<div class="row buttons">
-		<?php echo CHtml::submitButton('Crear', array('class'=>'btn btn-primary')); ?>
+		<?php echo CHtml::submitButton($model->isNewRecord ? 'Crear' : 'Guardar', array('class'=>'btn btn-primary')); ?>
 	</div>
 
 <?php $this->endWidget(); ?>

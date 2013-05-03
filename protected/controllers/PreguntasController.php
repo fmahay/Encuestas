@@ -22,6 +22,13 @@ class PreguntasController extends SCController
 		$model_encuesta = Encuesta::model()->findByPK($id);
 		if($model_encuesta->fk_admin_email !== Yii::app()->user->getId())
 			throw new CHttpException(404, 'The requested page does not exist.');
+		
+		if(EncuestaController::compareDates($model_encuesta->fecha_fin)) {
+			$this->render('/encuesta/message_warning',array(
+				'fecha_fin'=>$model_encuesta->fecha_fin,
+				'message'=>'No puede agregar preguntas a la encuesta'
+			));
+		}
 		else {
 			$model = new Preguntas;
 			$this->performAjaxValidation($model);
@@ -33,7 +40,10 @@ class PreguntasController extends SCController
 					$this->redirect(array('encuesta/view','id'=>$model->id_encuesta));
 			}
 
-			$this->render('create', array('model'=>$model));
+			$this->render('create', array(
+				'model'=>$model,
+				'id_encuesta'=>$model_encuesta->id
+			));
 		}
 	}
 

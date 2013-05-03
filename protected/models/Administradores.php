@@ -62,8 +62,6 @@ class Administradores extends CActiveRecord
 			'fk_tipo' => array(self::HAS_ONE, 'Usuarios', 'tipo'),
 			'fk_encuestas_tipo' => array(self::HAS_MANY, 'Encuesta', 'fk_admin_email, fk_admin_tipo'),
 			'count_encuestas_creadas' => array(self::STAT, 'Encuesta', 'fk_admin_email, fk_admin_tipo', 'select'=>'COUNT(t.id)'),
-			#'fk_encuestas_tipo' => array(self::HAS_MANY, 'Encuesta', 'fk_admin_tipo'),
-			#'fk_encuestas_mail' => array(self::HAS_MANY, 'Encuesta', 'fk_admin_email'),
 		);
 	}
 

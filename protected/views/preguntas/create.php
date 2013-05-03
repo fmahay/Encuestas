@@ -1,10 +1,12 @@
 <?php
 /* @var $this PreguntasController */
 /* @var $model Preguntas */
+/* @var $id_encuesta Encuesta */
 
 $this->breadcrumbs=array(
-	'Encuesta'=>array('index'),
-	'Create',
+	'Encuesta'=>array('encuesta/index'),
+	'Detalle'=>array('encuesta/view','id'=>$id_encuesta),
+	'Agregar Pregunta',
 );
 
 $this->menu=array(
@@ -13,6 +15,6 @@ $this->menu=array(
 );
 ?>
 
-<h1>Crear Encuesta</h1>
+<h3>Agregar Pregunta</h3>
 
 <?php echo $this->renderPartial('_form', array('model'=>$model)); ?>

@@ -2,6 +2,7 @@
 /* @var $this UsuariosController*/
 /* @var $model_usuario Usuarios */
 /* @var $form CActiveForm */
+
 ?>
 	
 <div class="modal-header">

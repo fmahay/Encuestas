@@ -1,6 +1,7 @@
 <?php
 /* @var $this UsuariosController*/
 /* @var $model Usuarios */
+
 ?>	
 <div class="modal-header">
 		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">

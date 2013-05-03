@@ -37,6 +37,10 @@ class DetEncuestas extends CActiveRecord
 		return 'det_encuestas';
 	}
 
+	public static function getStatus() {
+		return $list_status= array('0'=>'Pendiente', '1'=>'Contestada');
+	}
+
 	/**
 	 * @return array validation rules for model attributes.
 	 */
@@ -64,9 +68,8 @@ class DetEncuestas extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'fk_encuesta' => array(self::BELONGS_TO, 'Encuesta', 'fk_encuesta'),
-			'fk_usuarios_email' => array(self::BELONGS_TO, 'Usuarios', 'fk_usuarios_email'),
-			'fk_usuarios_tipo' => array(self::BELONGS_TO, 'Usuarios', 'fk_usuarios_tipo'),
+			'fk_encuesta_id' => array(self::BELONGS_TO, 'Encuesta', 'fk_encuesta'),
+			'fk_usuarios_email' => array(self::BELONGS_TO, 'Usuarios', 'fk_usuarios_email, fk_usuarios_tipo'),
 		);
 	}
 
@@ -78,7 +81,7 @@ class DetEncuestas extends CActiveRecord
 		return array(
 			'id' => 'ID',
 			'comentario' => 'Comentario',
-			'fecha' => 'Fecha',
+			'fecha' => 'Fecha respondida',
 			'status' => 'Status',
 			'fk_encuesta' => 'Fk Encuesta',
 			'fk_usuarios_email' => 'Fk Usuarios Email',

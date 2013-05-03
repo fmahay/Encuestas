@@ -30,6 +30,7 @@ class Usuarios extends CActiveRecord
 	public $new_pass;
 	public $confirm_new_pass;
 	public $check_tipo;
+	public $id;
 	
 	/**
 	 * Returns the static model of the specified AR class.
@@ -78,10 +79,18 @@ class Usuarios extends CActiveRecord
 		return uniqid('', true);
 	}
 	
+	/**
+	 * Find a list of users types.
+	 * @return array of users types.
+	 */
 	public static function getListTipos() {
 		return CHtml::listData(Usuarios::model()->findAll(array('select'=>'t.tipo', 'distinct'=>true)),'tipo', 'tipo');
 	}
 	
+	/**
+	 * Array of status options.
+	 * @return array of status options.
+	 */
 	public static function getStatus() {
 		return $list_status = array('0'=>'Inactivo', '1'=>'Activo');
 	}
@@ -121,11 +130,10 @@ class Usuarios extends CActiveRecord
 		// class name for the relations automatically generated below.
 		return array(
 			'fk_administradores_et' => array(self::HAS_ONE, 'Administradores', 'email, tipo'),
-			'fk_detEncuestas_email' => array(self::HAS_MANY, 'DetEncuestas', 'fk_usuarios_email'),
-			'fk_detEncuestases_tipo' => array(self::HAS_MANY, 'DetEncuestas', 'fk_usuarios_tipo'),
+			'fk_detEncuestas_email' => array(self::HAS_MANY, 'DetEncuestas', 'fk_usuarios_email, fk_usuarios_tipo'),
 			'fk_respuestas_email' => array(self::HAS_MANY, 'Respuestas', 'fk_usuarios_email'),
 			'fk_respuestas_tipo' => array(self::HAS_MANY, 'Respuestas', 'fk_usuarios_tipo'),
-			'count_encuestas_asignadas' => array(self::STAT, 'DetEncuestas', 'fk_usuarios_email, fk_usuarios_tipo', 'select'=>'SUM(t.id)'),
+			'count_encuestas_asignadas' => array(self::STAT, 'DetEncuestas', 'fk_usuarios_email, fk_usuarios_tipo', 'select'=>'COUNT(t.id)'),
 		);
 	}
 
@@ -174,6 +182,54 @@ class Usuarios extends CActiveRecord
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
 			'pagination'=>array('pageSize'=>5),
+		));
+	}
+
+	/**
+	 * Retrieves a list of models based on the current search/filter conditions.
+	 * This is used to assign users into survey.
+	 * @param integer id of a survey
+	 * @return CActiveDataProvider the data provider that can return the models based on the search/filter conditions.
+	 */
+	public function searchUsers($id_encuesta) 
+	{
+		$email = Yii::app()->user->getId();
+
+		$criteria=new CDbCriteria;
+		$criteria->condition = "email != '$email' && status=1 && email not in (select fk_usuarios_email from det_encuestas where fk_encuesta=$id_encuesta)";
+
+		$criteria->compare('email',$this->email,true);
+		$criteria->compare('tipo',$this->tipo,true);
+		$criteria->compare('nombre',$this->nombre,true);
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+			'pagination'=>array('pageSize'=>20),
+		));
+	}
+
+	/**
+	 * Retrieves a list of models based on the current search/filter conditions.
+	 * This is used to show assigned users to a survey.
+	 * @param integer id of a survey
+	 * @return CActiveDataProvider the data provider that can return the models based on the search/filter conditions.
+	 */
+	public function searchAssignedUsers($id_encuesta) {
+		$criteria=new CDbCriteria;
+
+		$criteria->select = "t.email ,t.tipo, t.nombre, de.status, de.id as id ";
+		$criteria->join = "INNER JOIN det_encuestas as de ON t.email = de.fk_usuarios_email && t.tipo = de.fk_usuarios_tipo";
+		$criteria->condition = "t.status = 1 && de.fk_encuesta = $id_encuesta";
+
+		$criteria->compare('email',$this->email,true);
+		$criteria->compare('tipo',$this->tipo,true);
+		$criteria->compare('nombre',$this->nombre,true);
+		$criteria->compare('status',DetEncuestas::model()->status,true);
+		$criteria->compare("id",DetEncuestas::model()->id,true);
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+			'pagination'=>array('pageSize'=>20),
 		));
 	}
 }

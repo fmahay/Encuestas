@@ -1,6 +1,7 @@
 <?php
 /*@var this UsuariosController*/ 
 /*@var model Usuarios*/
+
 $this->breadcrumbs=array(
 	'Mi Perfil',
 ); 

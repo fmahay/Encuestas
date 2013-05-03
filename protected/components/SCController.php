@@ -27,11 +27,11 @@ class SCController extends Controller
 	{
 		return array(
 			array('allow',
-				'actions'=>array('index', 'view', 'create', 'delete'),
+				'actions'=>array('index', 'view', 'create', 'delete', 'assign', 'assigned', 'unassign', 'score'),
 				'expression'=>'!$user->isGuest && $user->getState("tipo") == "Administrador"',
 			),
 			array('allow',
-				'actions'=>array('profile', 'update', 'changePassword','misencuestas'),
+				'actions'=>array('profile', 'update', 'changePassword','misencuestas','answer', 'myanswer'),
 				'expression'=>'!$user->isGuest',
 			),
 			array('deny'),

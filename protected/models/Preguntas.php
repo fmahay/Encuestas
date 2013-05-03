@@ -18,6 +18,8 @@
  */
 class Preguntas extends CActiveRecord
 {
+	public $respuesta;
+	
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @param string $className active record class name.
@@ -41,15 +43,13 @@ class Preguntas extends CActiveRecord
 	 */
 	public function rules()
 	{
-		// NOTE: you should only define rules for those attributes that
-		// will receive user inputs.
+		// NOTE: you should only define rules for those attributes that will receive user inputs.
 		return array(
 			array('pregunta, opcion1, opcion2, opcion3', 'required'),
 			array('pregunta', 'length', 'max'=>250),
 			array('opcion1, opcion2, opcion3', 'length', 'max'=>100),
 			// The following rule is used by search().
-			// Please remove those attributes that should not be searched.
-			array('id, id_encuesta, pregunta, opcion1, opcion2, opcion3', 'safe', 'on'=>'search'),
+			array('pregunta, opcion1, opcion2, opcion3', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -76,25 +76,26 @@ class Preguntas extends CActiveRecord
 			'id' => 'ID',
 			'id_encuesta' => 'Id Encuesta',
 			'pregunta' => 'Pregunta',
-			'opcion1' => 'Opcion1',
-			'opcion2' => 'Opcion2',
-			'opcion3' => 'Opcion3',
+			'opcion1' => 'Opción 1',
+			'opcion2' => 'Opción 2',
+			'opcion3' => 'Opción 3',
 		);
 	}
 
 	/**
 	 * Retrieves a list of models based on the current search/filter conditions.
+	 * @param integer id survey primary key
 	 * @return CActiveDataProvider the data provider that can return the models based on the search/filter conditions.
 	 */
-	public function search()
+	public function search($id)
 	{
 		// Warning: Please modify the following code to remove attributes that
 		// should not be searched.
-
+		
 		$criteria=new CDbCriteria;
+		$criteria->condition = "id_encuesta = $id";
 
 		$criteria->compare('id',$this->id);
-		$criteria->compare('id_encuesta',$this->id_encuesta);
 		$criteria->compare('pregunta',$this->pregunta,true);
 		$criteria->compare('opcion1',$this->opcion1,true);
 		$criteria->compare('opcion2',$this->opcion2,true);

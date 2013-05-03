@@ -3,7 +3,7 @@
 /* @var $model Encuesta */
 
 $this->breadcrumbs=array(
-	'Encuesta'=>array('index'),
+	'Mis Encuestas Creadas'=>array('index'),
 	'Create',
 );
 
@@ -13,6 +13,6 @@ $this->menu=array(
 );
 ?>
 
-<h1>Crear Encuesta</h1>
+<h3>Crear Encuesta</h3>
 
 <?php echo $this->renderPartial('_form', array('model'=>$model)); ?>

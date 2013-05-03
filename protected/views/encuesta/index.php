@@ -2,7 +2,7 @@
 /* @var $this EncuestaController */
 
 $this->breadcrumbs=array(
-	'Encuesta',
+	'Mis Encuestas Creadas',
 );
 
 Yii::app()->clientScript->registerScript('search', "
@@ -11,7 +11,7 @@ Yii::app()->clientScript->registerScript('search', "
 			return false;
 		});
 		$('.search-form form').submit(function(){
-			$.fn.yiiGridView.update('tareas-grid', {
+			$.fn.yiiGridView.update('encuesta-grid', {
 				data: $(this).serialize()
 			});
 			return false;
@@ -23,11 +23,6 @@ $this->menu=array(
 );
 ?>
 <h1 align="center">Administración de Encuestas Creadas</h1>
-
-<p>
-	You may optionally enter a comparison operator (<b>&lt;</b>, <b>&lt;=</b>, <b>&gt;</b>, <b>&gt;=</b>, <b>&lt;&gt;</b>
-	or <b>=</b>) at the beginning of each of your search values to specify how the comparison should be done.
-</p>
 
 <div id="modal_upd_status" class="modal hide fade">
 	<div class="modal-header">
@@ -52,13 +47,6 @@ $this->menu=array(
 	</div>
 		</form>
 </div>
-
-<?php echo CHtml::link('Advanced Search','#',array('class'=>'search-button')); ?>
-<div class="search-form" style="display:none">
-	<?php $this->renderPartial('_search',array(
-		'model'=>$model,
-	)); ?>
-</div><!-- search-form -->
 
 <?php
 $this->widget('zii.widgets.grid.CGridView', array(
@@ -122,7 +110,7 @@ $this->widget('zii.widgets.grid.CGridView', array(
 		array(
 			'class'=>'CButtonColumn',
 			'header'=>'Acciones',
-			'template'=>'{view} {update} {delete}',
+			'template'=>'{view} {update} {delete} {edit} {score}',
 			'buttons'=>array(
 				'view'=>array(
 					'url'=>'Yii::app()->controller->createUrl("view", array("id"=>$data->id))',
@@ -165,21 +153,24 @@ $this->widget('zii.widgets.grid.CGridView', array(
 						$('#modal_upd_status').modal({show:true});
                     }",
 				),
+				'edit'=>array(
+					'url'=>'Yii::app()->controller->createUrl("update", array("id"=>$data->id))',
+					'imageUrl'=>Yii::app()->baseUrl.'/images/writing_file.png',
+					'options'=>array('title'=>'Editar Registro', ),
+				),
+				'score'=>array(
+					'url'=>'Yii::app()->controller->createUrl("score", array("id"=>$data->id))',
+					'label'=>'<i class="icon-signal"></i>',
+					'options'=>array('title'=>'Ver Resultados'),
+			        'visible'=>'EncuestaController::compareDates($data->fecha_fin) ? true : false',
+				),
 			),
 			'htmlOptions'=>array('style'=>'width:300px|important'),
 			'headerHtmlOptions'=>array('style'=>'width:300px|important'),
 		),
-		array(
-			'class'=>'CLinkColumn',
-			'header'=>'Editar',
-			'imageUrl'=>Yii::app()->baseUrl.'/images/writing_file.png',
-			'labelExpression'=>'"Editar registro"',
-			'urlExpression'=>'Yii::app()->controller->createUrl("update", array("id"=>$data->id))',
-			'htmlOptions'=>array('style'=>'text-align:center', 'title'=>'Editar registro'),
-		),
 	),
 	'htmlOptions'=>array(
-		'class'=>'table  table-striped table-hover',
+		'class'=>'table table-striped table-hover',
 	),
 	'pagerCssClass'=>'pagination pagination-centered',
 	'pager'=>array(

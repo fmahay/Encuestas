@@ -15,6 +15,8 @@
 	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/main.css" />
 	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/form.css" />
 	<?php Yii::app()->clientScript->registerScriptFile('js/jquery.js'); ?>
+	<?php Yii::app()->clientScript->registerScriptFile('https://www.google.com/jsapi'); ?>
+
 	<?php echo Yii::app()->bootstrap->register(); ?>
 
 	<title><?php echo CHtml::encode($this->pageTitle); ?></title>
