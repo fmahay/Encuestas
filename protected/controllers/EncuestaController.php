@@ -149,7 +149,7 @@ class EncuestaController extends SCController
 			));
 		} else {
 			$modelU = new Usuarios('search');
-			$model->unsetAttributes();
+			$modelU->unsetAttributes();
 			
 			if(isset($_GET['Usuarios']))
 				$modelU->attributes=$_GET['Usuarios'];
@@ -186,7 +186,7 @@ class EncuestaController extends SCController
 			throw new CHttpException(404, 'The requested page does not exist.');
 		else {
 			$modelU = new Usuarios('search');
-			$model->unsetAttributes();
+			$modelU->unsetAttributes();
 			
 			if(isset($_GET['Usuarios']))
 				$modelU->attributes=$_GET['Usuarios'];

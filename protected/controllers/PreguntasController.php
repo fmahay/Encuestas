@@ -25,11 +25,13 @@ class PreguntasController extends SCController
 		
 		if(EncuestaController::compareDates($model_encuesta->fecha_fin)) {
 			$this->render('/encuesta/message_warning',array(
-				'fecha_fin'=>$model_encuesta->fecha_fin,
 				'message'=>"No puede agregar preguntas a la encuesta, el tiempo de finalización ($model_encuesta->fecha_fin) ha concluido."
 			));
-		}
-		else {
+		} else if($model_encuesta->count_respondidas() > 0) {
+			$this->render('/encuesta/message_warning',array(
+				'message'=>"No puede agregar preguntas a la encuesta, uno o más usuarios ya han respondido la encuesta."
+			));
+		} else {
 			$model = new Preguntas;
 			$this->performAjaxValidation($model);
 			if(isset($_POST['Preguntas'])) {
