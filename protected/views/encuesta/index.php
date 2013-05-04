@@ -113,7 +113,7 @@ $this->widget('zii.widgets.grid.CGridView', array(
 			'template'=>'{view} {update} {delete} {edit} {score}',
 			'buttons'=>array(
 				'view'=>array(
-					'url'=>'Yii::app()->controller->createUrl("view", array("id"=>$data->id))',
+					'url'=>'Yii::app()->controller->createUrl("view", array("id"=>$data->id,"nombre"=>$data->nombre))',
 				),
 				'update'=>array(
 					'url'=>'Yii::app()->controller->createUrl("delete", array("id"=>$data->id))',
@@ -159,7 +159,7 @@ $this->widget('zii.widgets.grid.CGridView', array(
 					'options'=>array('title'=>'Editar Registro', ),
 				),
 				'score'=>array(
-					'url'=>'Yii::app()->controller->createUrl("score", array("id"=>$data->id))',
+					'url'=>'Yii::app()->controller->createUrl("score", array("id"=>$data->id,"nombre"=>$data->nombre))',
 					'label'=>'<i class="icon-signal"></i>',
 					'options'=>array('title'=>'Ver Resultados'),
 			        'visible'=>'EncuestaController::compareDates($data->fecha_fin) ? true : false',

@@ -79,13 +79,13 @@ $this->breadcrumbs=array(
 			'template'=>'{results}{answer}',
 			'buttons'=> array(
 			    'results'=>array(
-			        'url'=>'Yii::app()->controller->createUrl("myanswer", array("id"=>$data->id))',
+			        'url'=>'Yii::app()->controller->createUrl("myanswer", array("id"=>$data->id,"nombre"=>$data->nombre))',
 			        'label'=>'<i class="icon-signal"></i>',
 					'options'=>array('title'=>'Ver Mis Respuestas'),
 			        'visible'=>'$data->status_det == 0 ? false : true',
 			    ),
 			    'answer'=>array(
-			        'url'=>'Yii::app()->controller->createUrl("answer", array("id"=>$data->id))',
+			        'url'=>'Yii::app()->controller->createUrl("answer", array("id"=>$data->id,"nombre"=>$data->nombre))',
 			        'label'=>'<i class="icon-ok"></i>',
 					'options'=>array('title'=>'Responder Encuesta'),
 			        'visible'=>'$data->status_det == 1 ? false : true',

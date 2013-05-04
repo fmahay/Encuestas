@@ -26,7 +26,7 @@ class PreguntasController extends SCController
 		if(EncuestaController::compareDates($model_encuesta->fecha_fin)) {
 			$this->render('/encuesta/message_warning',array(
 				'fecha_fin'=>$model_encuesta->fecha_fin,
-				'message'=>'No puede agregar preguntas a la encuesta'
+				'message'=>"No puede agregar preguntas a la encuesta, el tiempo de finalización ($model_encuesta->fecha_fin) ha concluido."
 			));
 		}
 		else {
