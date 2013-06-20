@@ -146,9 +146,9 @@ class Encuesta extends CActiveRecord
 		$criteria=new CDbCriteria;
 		$criteria->select = "t.id, t.nombre, t.fecha_inicio, t.fecha_fin, t.status, de.id as id_det, de.status as status_det ";
 		$criteria->join = "INNER JOIN det_encuestas as de ON t.id = de.fk_encuesta ";
-		$criteria->condition = "de.fk_usuarios_email = '$email' && de. fk_usuarios_tipo = '$tipo' && t.status =1";
+		$criteria->condition = "de.fk_usuarios_email = '$email' && de.fk_usuarios_tipo = '$tipo' && t.status =1";
 
-		$criteria->compare('id',$this->id);
+		$criteria->compare('t.id',$this->id);
 		$criteria->compare('nombre',$this->nombre,true);
 		$criteria->compare('fecha_inicio',$this->fecha_inicio,true);
 		$criteria->compare('fecha_fin',$this->fecha_fin,true);
